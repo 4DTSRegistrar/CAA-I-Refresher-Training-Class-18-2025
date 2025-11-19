@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CAA-I Refresher Training Class 18-2025 | Student List</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        padding: 20px;
+        text-align: center;
+    }
+    #logo {
+        width: 100px;
+        margin-bottom: 10px;
+    }
+    h2 { margin-bottom: 5px; }
+    #table-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+    }
+    table {
+        border-collapse: collapse;
+        width: 95%;
+        max-width: 900px;
+        background: white;
+        box-shadow: 0 0 10px #ccc;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    th, td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        font-size: 14px;
+    }
+    th {
+        background: #1a73e8;
+        color: white;
+    }
+    tr:hover { background: #f1f1f1; }
+    #pdf-btn {
+        margin-top: 15px;
+        padding: 10px 20px;
+        background: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    #pdf-btn:hover { background: #0c56c2; }
+</style>
+</head>
+<body>
+
+<img id="logo" src="assets/logo.png" alt="Unit Logo">
+
+<h2>CAA-I Refresher Training Class 18-2025</h2>
+<p>Official List of Students</p>
+
+<button id="pdf-btn" onclick="openPDF()">OPEN CERTIFICATE PDF</button>
+
+<div id="table-container">
+    <table id="student-table">
+        <thead>
+            <tr>
+                <th>CERT ID</th>
+                <th>NAME</th>
+                <th>COURSE</th>
+                <th>DATE</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+            <tr><td colspan="4">Loading list...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+async function loadStudents() {
+    const tbody = document.getElementById("table-body");
+
+    try {
+        const response = await fetch("students.csv");
+        const text = await response.text();
+        const lines = text.split("\n").filter(line => line.trim() !== "");
+
+        tbody.innerHTML = "";
+
+        for (let i = 1; i < lines.length; i++) {
+            const cols = lines[i].split(",");
+            if (cols.length < 4) continue;
+
+            let row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${cols[0].trim()}</td>
+                <td>${cols[1].trim()}</td>
+                <td>${cols[2].trim()}</td>
+                <td>${cols[3].trim()}</td>
+            `;
+            tbody.appendChild(row);
+        }
+
+    } catch (error) {
+        tbody.innerHTML = "<tr><td colspan='4' style='color:red;'>Error loading students.csv</td></tr>";
+    }
+}
+
+function openPDF() {
+    window.open("Certificates/certificates/certificates.pdf", "_blank");
+}
+
+window.onload = loadStudents;
+</script>
+
+</body>
+</html>

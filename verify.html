@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Certificate Verification</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        padding: 40px;
+        text-align: center;
+    }
+    #container {
+        background: white;
+        max-width: 500px;
+        margin: auto;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 0 10px #bbb;
+    }
+    #logo {
+        width: 100px;
+        margin-bottom: 10px;
+    }
+    input {
+        width: 90%;
+        padding: 12px;
+        margin-top: 10px;
+        border-radius: 5px;
+        border: 1px solid #aaa;
+    }
+    button {
+        margin-top: 15px;
+        padding: 10px 20px;
+        background: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    button:hover { background: #0c56c2; }
+    #result { margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div id="container">
+
+    <img id="logo" src="assets/logo.png" alt="Unit Logo">
+
+    <h2>Certificate Verification</h2>
+    <p>CAA-I Refresher Training Class 18-2025</p>
+
+    <input type="text" id="query" placeholder="Enter CERT ID or NAME">
+    <button onclick="verify()">Verify</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+async function verify() {
+    const input = document.getElementById("query").value.trim().toLowerCase();
+    const resultBox = document.getElementById("result");
+
+    if (!input) {
+        resultBox.innerHTML = "<p style='color:red;'>Please enter CERT ID or NAME.</p>";
+        return;
+    }
+
+    resultBox.innerHTML = "Checking...";
+
+    try {
+        const response = await fetch("students.csv");
+        const text = await response.text();
+        const lines = text.split("\n");
+
+        let found = null;
+
+        for (let i = 1; i < lines.length; i++) {
+            const cols = lines[i].split(",");
+            if (cols.length < 4) continue;
+
+            let certID = cols[0].trim().toLowerCase();
+            let name = cols[1].trim().toLowerCase();
+            let course = cols[2].trim();
+            let date = cols[3].trim();
+
+            if (input === certID || input === name) {
+                found = { certID, name, course, date };
+                break;
+            }
+        }
+
+        if (found) {
+            resultBox.innerHTML = `
+                <p><strong>Record Verified</strong></p>
+                <p>Name: ${found.name.toUpperCase()}</p>
+                <p>Cert ID: ${found.certID.toUpperCase()}</p>
+                <p>Course: ${found.course}</p>
+                <p>Date: ${found.date}</p>
+
+                <a href="Certificates/certificates/certificates.pdf" target="_blank">
+                    <button>Open Certificate PDF</button>
+                </a>
+                <p style="font-size:12px; color:#777;">(Scroll to find your certificate inside the PDF)</p>
+            `;
+        } else {
+            resultBox.innerHTML = "<p style='color:red;'>Record not found.</p>";
+        }
+
+    } catch (error) {
+        resultBox.innerHTML = "<p style='color:red;'>Error loading students.csv.</p>";
+    }
+}
+</script>
+
+</body>
+</html>
